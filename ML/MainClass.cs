@@ -14,12 +14,13 @@ namespace ML
         public static void Main(string[] args)
         {
             var data = LoadData.LoadCsv<Iris,IrisMap>("iris.csv");
-            var svm = new SVM();
-            var nn = new Neuro();
-            foreach (var item in data.Where(x => x.Species == "setosa"))
-            {
-                Console.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}",item.PetalLength,item.PetalWidth,item.SepalLength,item.SepalWidth,item.Species);
-            }
+            var labelname = data.GroupBy(x => x.Species).Select(x => x.Key).ToList();
+            var train = (from n in data select new double[]{n.PetalLength,n.PetalWidth,n.SepalLength,n.SepalWidth}).ToArray();
+            var label = data.Select(x => labelname.IndexOf(x.Species)).ToArray();
+            Console.WriteLine("{0}",data.GroupBy(x => x.Species).Count());
+            var svm = new SVM(train, label);
+            svm.learn();
+            svm.predict(train[0]);
         }
     }
 }

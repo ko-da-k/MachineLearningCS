@@ -13,9 +13,36 @@ namespace ML
 {
     class SVM
     {
-        public SVM()
+        MulticlassSupportVectorMachine msvm;
+        double[][] inputs { get; set; }
+        int[] outputs { get; set; }
+
+        public SVM(double[][] inputs, int[] outputs)
         {
-            Console.WriteLine("Not Implemented");
+            this.inputs = inputs;
+            this.outputs = outputs;
+        }
+
+        public SVM() { }
+
+        public void learn()
+        {
+            var kernel = new Accord.Statistics.Kernels.Linear();
+            var classes = outputs.GroupBy(x => x).Count();
+            msvm = new MulticlassSupportVectorMachine(0, kernel, classes);
+            var teacher = new MulticlassSupportVectorLearning(msvm, inputs, outputs);
+            teacher.Algorithm = (machine, inputs, outputs, class1, class2) =>
+            {
+                var smo = new SequentialMinimalOptimization(machine, inputs, outputs);
+                smo.UseComplexityHeuristic = true;
+                return smo;
+            };
+            teacher.Run();
+        }
+        public void predict(double[] data)
+        {
+            var result = msvm.Compute(data);
+            Console.WriteLine(result);
         }
     }
 }
