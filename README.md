@@ -1,2 +1,2 @@
-# ML_in_CS
+# MachineLearningCS
 sample Accord.net
