@@ -39,10 +39,10 @@ namespace ML
             };
             teacher.Run();
         }
-        public void predict(double[] data)
+        public int predict(double[] data)
         {
             var result = msvm.Compute(data);
-            Console.WriteLine(result);
+            return result;
         }
     }
 }

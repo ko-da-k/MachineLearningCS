@@ -17,14 +17,38 @@ namespace ML
             var data = LoadData.LoadCsv<Iris, IrisMap>("iris.csv");
             var labelname = data.Select(x => x.Species).Distinct().ToArray();
 
-            var train = (from n in data select new double[] { n.PetalLength, n.PetalWidth, n.SepalLength, n.SepalWidth }).ToArray();
+            var feature = (from n in data select new double[] { n.PetalLength, n.PetalWidth, n.SepalLength, n.SepalWidth }).ToArray();
             var label = data.Select(x => Array.IndexOf(labelname, x.Species)).ToArray();
 
-            ClassificationReport(new int[] { 1, 0, 1, 0, 1 }, new int[] { 1, 1, 1, 0, 0 });
+            var train = feature.Select((x, i) => new { Content = x, Index = i })
+                               .Where(x => x.Index < 40 ||
+                                      (x.Index >= 50 && x.Index < 90) ||
+                                      (x.Index >= 100 && x.Index < 140))
+                               .Select(x => x.Content)
+                               .ToArray();
+            var trainl = label.Select((x, i) => new { Content = x, Index = i })
+                              .Where(x => x.Index < 40 ||
+                                     (x.Index >= 50 && x.Index < 90) ||
+                                     (x.Index >= 100 && x.Index < 140))
+                              .Select(x => x.Content)
+                              .ToArray(); ;
+            var test = feature.Select((x, i) => new { Content = x, Index = i })
+                              .Where(x => (x.Index >= 40 && x.Index <50) || 
+                                     (x.Index >= 90 && x.Index < 100) ||
+                                      x.Index >= 140)
+                              .Select(x => x.Content)
+                              .ToArray();
+            var testl = label.Select((x, i) => new { Content = x, Index = i })
+                             .Where(x => (x.Index >= 40 && x.Index < 50) ||
+                                    (x.Index >= 90 && x.Index < 100) ||
+                                    x.Index >= 140)
+                             .Select(x => x.Content)
+                             .ToArray();
 
-            var svm = new SVM(train, label);
+            var svm = new SVM(train, trainl);
             svm.learn();
-            svm.predict(train[0]);
+            var result = test.Select(x => svm.predict(x)).ToArray();
+            ClassificationReport(testl, result);
         }
         /// <summary>
         /// Classifications the report.

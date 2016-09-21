@@ -17,7 +17,7 @@ namespace ML
         public static List<T> LoadCsv<T, M>(string filename) where M : CsvHelper.Configuration.CsvClassMap<T>
         {
             //絶対ファイルパス
-            using (var parse = new CsvHelper.CsvReader(new StreamReader(filename)))
+            using (var parse = new CsvReader(new StreamReader(filename)))
             {
                 parse.Configuration.HasHeaderRecord = false;
                 parse.Configuration.RegisterClassMap<M>();
